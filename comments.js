@@ -1,60 +1,22 @@
-//create web server
-var http = require('http');
-var fs = require('fs');
-var url = require('url');
-var path = require('path');
-var comments = [];
-var server = http.createServer(function(req, res){
-  var parseObj = url.parse(req.url, true);
-  var pathname = parseObj.pathname;
-  if(pathname === '/'){
-    fs.readFile('./views/index.html', function(err, data){
-      if(err){
-        return res.end('404 Not Found');
-      }
-      var htmlStr = template.render(data.toString(), {
-        comments: comments
-      });
-      res.end(htmlStr);
-    });
-  }else if(pathname === '/post'){
-    fs.readFile('./views/post.html', function(err, data){
-      if(err){
-        return res.end('404 Not Found');
-      }
-      res.end(data);
-    });
-  }else if(pathname.indexOf('/public/') === 0){
-    fs.readFile('.' + pathname, function(err, data){
-      if(err){
-        return res.end('404 Not Found');
-      }
-      res.end(data);
-    });
-  }else if(pathname === '/pinglun'){
-    var comment = parseObj.query;
-    comment.dateTime = '2019-10-10';
-    comments.unshift(comment);
-    res.statusCode = 302;
-    res.setHeader('Location', '/');
-    res.end();
-  }else{
-    fs.readFile('./views/404.html', function(err, data){
-      if(err){
-        return res.end('404 Not Found');
-      }
-      res.end(data);
-    });
-  }
+// Create web server
+const express = require('express');
+const app = express();
+const port = 3000;
+app.use(express.static('public'));
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
-server.listen(3000, function(){
-  console.log('Server is running...');
+// Create a route for GET requests
+app.get('/comments', (req, res) => {
+  // Send a response
+  res.send('This is a GET request');
 });
-
-var template = {
-  render: function(tpl, data){
-    return tpl.replace(/{{([^{}]+)}}/g, function(matched, key){
-      return data[key];
-    });
-  }
-};
+app.post('/comments', (req, res) => {
+  res.send('This is a POST request');
+});
+app.put('/comments', (req, res) => {
+  res.send('This is a PUT request');
+});
+app.delete('/comments', (req, res) => {
+  res.send('This is a DELETE request');
+});
